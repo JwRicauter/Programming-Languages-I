@@ -1,4 +1,8 @@
-module Pixels (...) where
+--module Pixels (...) where
+import Data.Char
+import Data.List (transpose)
+import Numeric (showHex, showIntAtBase)
+
 
 fontBitmap =
   [
@@ -97,8 +101,46 @@ fontBitmap =
     [ 0x00, 0x00, 0x7F, 0x00, 0x00 ], --  |
     [ 0x00, 0x41, 0x36, 0x08, 0x00 ]  --  }
   ]
-  
-font = undefined
+ 
+data Pixel = Pixel {mensaje:: String,
+                    color::String}
+
+--covierte el Pixel a [Char]dibujarListas (font 33) > "****** /n  *   */n  *   */n  *   */n****** /n"
+dibujarListas [] =[]
+dibujarListas lista = binToString(completeBin1(showIntAtBase 2 intToDigit (head lista) "n")) ++ dibujarListas (tail lista)  
+
+
+-- Corta el string en grupos de 7
+cortar [] = []
+cortar lista = primero : cortar sobrante where (primero, sobrante) = splitAt 7 lista
+
+-- Traspone una lista (cambia filas por columnas)
+traspuesta lista = transpose $ cortar lista
+
+-- Se hace reverse a la lista
+vuelta lista = reverse (traspuesta lista)
+
+imprimir lista = mapM_ print (vuelta (lista))
+
+-- Pasa de binario a * y " " Ej:  binToString "110110"   >"** ** "
+binToString [] = ""
+binToString xs 
+				| (head xs == '1') = "*" ++ binToString (tail xs) 
+				| (head xs == '0') = " " ++ binToString (tail xs) 
+				| (head xs == 'n') = "/n" ++ binToString (tail xs)
+
+-- Completa los bits con ceros a la izquierda
+completeBin1 x 
+				| (length x < 8) = reverse(completeBin1 ("0"++x)) 
+				| (length x == 8) = x 
+
+-- Completa, a cada elemento de la lista, con ceros a la izquierda 
+completeBin []=[]
+completeBin xs = completeBin1(head xs): completeBin (tail xs)
+
+
+font a = fontBitmap!!a
+
 
 pixelsToString = undefined
 pixelListToPixels = undefined
