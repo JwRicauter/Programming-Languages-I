@@ -1,9 +1,10 @@
---module Pixels (...) where
+
+module Pixels ( fontBitmap,
+        font,pixelsToString,
+        pixelListToPixels,pixelListToString) where
 import Data.Char
-import Data.List (transpose)
-import Numeric (showHex, showIntAtBase)
-
-
+import Data.List
+import Numeric(showHex, showIntAtBase)
 fontBitmap =
   [
     [ 0x00, 0x00, 0x00, 0x00, 0x00 ], --  (space)
@@ -101,14 +102,15 @@ fontBitmap =
     [ 0x00, 0x00, 0x7F, 0x00, 0x00 ], --  |
     [ 0x00, 0x41, 0x36, 0x08, 0x00 ]  --  }
   ]
- 
-data Pixel = Pixel {mensaje:: String,
-                    color::String}
+
+data Pixel = Pixel {mensaje:: String}
 
 --covierte el Pixel a [Char]dibujarListas (font 33) > "****** /n  *   */n  *   */n  *   */n****** /n"
 dibujarListas [] =[]
-dibujarListas lista = binToString(completeBin1(showIntAtBase 2 intToDigit (head lista) "n")) ++ dibujarListas (tail lista)  
+dibujarListas lista = binToString(completeBin1(showIntAtBase 2 intToDigit (head lista) "")) ++ dibujarListas (tail lista)  
 
+hexaToBin [] = [] 
+hexaToBin lista = showIntAtBase 2 intToDigit (head lista) "": hexaToBin (tail lista)
 
 -- Corta el string en grupos de 7
 cortar [] = []
@@ -120,30 +122,39 @@ traspuesta lista = transpose $ cortar lista
 -- Se hace reverse a la lista
 vuelta lista = reverse (traspuesta lista)
 
-imprimir lista = mapM_ print (vuelta (lista))
+
+imprimir lista = (vuelta (lista))
+
 
 -- Pasa de binario a * y " " Ej:  binToString "110110"   >"** ** "
 binToString [] = ""
 binToString xs 
-				| (head xs == '1') = "*" ++ binToString (tail xs) 
-				| (head xs == '0') = " " ++ binToString (tail xs) 
-				| (head xs == 'n') = "/n" ++ binToString (tail xs)
+                | (head xs == '1') = "*" ++ binToString (tail xs) 
+                | (head xs == '0') = " " ++ binToString (tail xs) 
+                | (head xs == 'n') = "\n" ++ binToString (tail xs)
 
 -- Completa los bits con ceros a la izquierda
 completeBin1 x 
-				| (length x < 8) = reverse(completeBin1 ("0"++x)) 
-				| (length x == 8) = x 
+                | (length x < 7) = reverse(completeBin1 ("0"++x)) 
+                | (length x == 7) = x 
 
 -- Completa, a cada elemento de la lista, con ceros a la izquierda 
 completeBin []=[]
 completeBin xs = completeBin1(head xs): completeBin (tail xs)
 
+concatenar [] = ""
+concatenar lista_char = head lista_char ++ concatenar (tail lista_char)
 
-font a = fontBitmap!!a
+font a =  imprimir ( dibujarListas (fontBitmap!!((ord a) -32)))
 
 
-pixelsToString = undefined
-pixelListToPixels = undefined
+pixelsToString letra = concatenar(vuelta (dibujarListas(fontBitmap!!((ord letra) - 32))))
+
+--Ejemplo de uso mappM_ print (pixelListToPixels [font 'N', font 'A', font 'I'])
+
+pixelListToPixels []=[]
+pixelListToPixels lista_pixels = (head lista_pixels )++[""] ++pixelListToPixels (tail lista_pixels)
+
 pixelListToString = undefined
 
 concatPixels = undefined
