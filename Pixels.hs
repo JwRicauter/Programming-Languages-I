@@ -1,6 +1,8 @@
---module Pixels ( fontBitmap,
---        font,pixelsToString,
---        pixelListToPixels,pixelListToString) where
+-- Proyecto No. 1
+-- Laboratorio de Lenguajes de Programacion I
+-- Integrantes:
+--              Nairelys Hernandez, 12-10199
+--              Jawil Ricauter, 13-11199
 
 
 module Pixels ( fontBitmap,
@@ -10,6 +12,7 @@ module Pixels ( fontBitmap,
 import Data.Char
 import Data.List
 import Numeric(showHex, showIntAtBase)
+
 fontBitmap =
   [
     [ 0x00, 0x00, 0x00, 0x00, 0x00 ], --  (space)
@@ -108,89 +111,213 @@ fontBitmap =
     [ 0x00, 0x41, 0x36, 0x08, 0x00 ]  --  }
   ]
 
-data Pixel = Pixel {mensaje:: String}
 
---covierte el Pixel a [Char]dibujarListas (font 33) > "****** /n  *   */n  *   */n  *   */n****** /n"
-dibujarListas [] =[]
-dibujarListas lista = binToString(completeBin1(showIntAtBase 2 intToDigit (head lista) "")) ++ dibujarListas (tail lista)  
+------------------------------------------------------
 
+-- Tipo de dato : Pixel
+data Pixel = Pixel{ mensaje:: String }
+
+------------------------------------------------------
+
+                -- Funciones Auxiliares
+
+
+-- Convierte el numero de hexadecimal a binario.
+
+hexaToBin :: (Integral a, Show a) => [a] -> [String]
 hexaToBin [] = [] 
-hexaToBin lista = showIntAtBase 2 intToDigit (head lista) "": hexaToBin (tail lista)
-
--- Corta el string en grupos de 7
-cortar [] = []
-cortar lista = primero : cortar sobrante where (primero, sobrante) = splitAt 7 lista
-
--- Traspone una lista (cambia filas por columnas)
-traspuesta lista = transpose $ cortar lista
-
--- Se hace reverse a la lista
-vuelta lista = reverse (traspuesta lista)
+hexaToBin lista = showIntAtBase 2 intToDigit ( head lista ) "": hexaToBin ( tail lista )
 
 
-imprimir lista = (vuelta (lista))
+-- Completa, a cada elemento de la lista, con ceros a la izquierda .
+
+completeBin :: [[Char]] -> [[Char]]
+completeBin [] = []
+completeBin xs = completeBin1( head xs ): completeBin ( tail xs )
 
 
--- Pasa de binario a * y " " Ej:  binToString "110110"   >"** ** "
+-- Completa los bits con ceros a la izquierda.
+
+completeBin1 :: [Char] -> [Char]
+completeBin1 x 
+                | ( length x < 7 ) = completeBin1 ( "0" ++ x ) 
+                | ( length x < 7 ) = reverse( completeBin1 ( "0" ++ x ) ) 
+                | ( length x == 7 ) = x 
+
+
+-- Pasa de binario a * y " " Ej:  binToString "110110"   >"** ** ".
+
+binToString:: [Char] -> [Char]
 binToString [] = ""
 binToString xs 
-                | (head xs == '1') = "*" ++ binToString (tail xs) 
-                | (head xs == '0') = " " ++ binToString (tail xs) 
-                | (head xs == 'n') = "\n" ++ binToString (tail xs)
+                | ( head xs == '1' ) = "*" ++ binToString ( tail xs ) 
+                | ( head xs == '0' ) = " " ++ binToString ( tail xs ) 
+                | ( head xs == 'n' ) = "\n" ++ binToString ( tail xs )
 
--- Completa los bits con ceros a la izquierda
-completeBin1 x 
-                | (length x < 7) = completeBin1 ("0"++x) 
-                | (length x < 7) = reverse(completeBin1 ("0"++x)) 
-                | (length x == 7) = x 
 
--- Completa, a cada elemento de la lista, con ceros a la izquierda 
-completeBin []=[]
-completeBin xs = completeBin1(head xs): completeBin (tail xs)
+--covierte el Pixel a [Char]dibujarListas (font 33) > "****** /n  *   */n  *   */n  *   */n****** /n"
 
+dibujarListas :: (Integral a, Show a) => [a] -> [Char]
+dibujarListas [] = []
+dibujarListas lista = binToString( completeBin1 ( showIntAtBase 2 intToDigit ( head lista ) "") ) ++ dibujarListas ( tail lista )  
+
+
+-- Corta el string en grupos de 7, pe. "trololotrololo" -> ["trololo", "trololo"].
+
+cortar :: [t] -> [[t]]
+cortar [] = []
+cortar lista = primero : cortar sobrante where ( primero, sobrante ) = splitAt 7 lista
+
+
+-- Traspone una lista (cambia filas por columnas).
+
+traspuesta :: [a] -> [[a]]
+traspuesta [] = []
+traspuesta lista = transpose $ cortar lista
+
+
+-- Se hace reverse a la lista.
+
+vuelta :: [a] -> [[a]]
+vuelta lista = reverse ( traspuesta lista )
+
+
+-- Metodo para imprimir el font.
+
+imprimir :: [a] -> [[a]]
+imprimir lista = ( vuelta ( lista ) )
+
+
+-- Funcion que concatena strings.
+
+concatenar :: [[Char]] -> [Char]
 concatenar [] = ""
-concatenar lista_char = head lista_char ++ concatenar (tail lista_char)
-
-font a =  imprimir ( dibujarListas (fontBitmap!!((ord a) -32)))
+concatenar lista_char = head lista_char ++ concatenar ( tail lista_char )
 
 
-pixelsToString letra = concatenar(vuelta (dibujarListas(fontBitmap!!((ord letra) - 32))))
+-- Metodo font que devuelve el grafico del caracter.
 
---Ejemplo de uso mappM_ print (pixelListToPixels [font 'N', font 'A', font 'I'])
+font :: Char -> [[Char]]
+font a =  imprimir ( dibujarListas ( fontBitmap!!( ( ord a ) -32 ) ) )
 
 
+-- Concatena la forma grafica de un pixel sin espacio en medio.
 
-pixelsToString letra = concatenar(vuelta (dibujarListas(fontBitmap!!((ord letra) - 32))))
-
---Ejemplo de uso mappM_ print (pixelListToPixels [font 'N', font 'A', font 'I'])
-
-pixelListToPixels []=[]
-pixelListToPixels lista_pixels = (head lista_pixels )++[""] ++pixelListToPixels (tail lista_pixels)
-
-pixelListToString = undefined
-
---
-
+concatAlLado :: [[t]] -> [t]
 concatAlLado [] = []
-concatAlLado lista_pixels = (head lista_pixels) ++ concatAlLado ( tail lista_pixels)
+concatAlLado lista_pixels = ( head lista_pixels ) ++ concatAlLado ( tail lista_pixels )
 
---
+
+-- Concatena dos pixeles horizontalmente con un espacio en medio.
+
+concatHorizontalConEspacio :: [Char] -> [Char]
+concatHorizontalConEspacio [] = []
+concatHorizontalConEspacio lista = dibujarListas ( ( fontBitmap!!( ord(head lista) -32) ) ) ++ "       " ++ concatHorizontalConEspacio (tail lista) 
+
+
+-- Funcion que remplaza los bits encendidos por los apagados y viceversa.
+
+astToSpace :: [Char] -> [Char]
+astToSpace [] = ""
+astToSpace xs 
+                | ( head xs == '*' ) = " " ++ astToSpace ( tail xs ) 
+                | ( head xs == ' ' ) = "*" ++ astToSpace ( tail xs )
+
+
+------------------------------------------------------
+
+
+-- PixelToString convierte un valor del tipo pixel, en un string, incluyendo los saltos.
+
+pixelsToString :: [[Char]] -> [Char]
+pixelsToString fuente = concatenar ( fuente )
+
+
+------------------------------------------------------
+
+
+-- pixelListToPixels convierte una lista de Pixeles en un unico valor Pixels que lo represente.
+
+pixelListToPixels :: [[[Char]]] -> [[Char]]
+pixelListToPixels [] = []
+pixelListToPixels lista_pixels = ( head lista_pixels ) ++ ["     "] ++ pixelListToPixels ( tail lista_pixels )
+
+
+------------------------------------------------------
+
+
+-- Procesa lista de pixels, convirtiendo cada elemento a string
+-- y luego mezcla todos los resultados incluyendo saltos de linea.
+
+pixelListToString :: [[[Char]]] -> [[Char]]
+pixelListToString lista_pixels = pixelListToPixels ( lista_pixels )
+
+
+------------------------------------------------------
+
+
+-- Recibe una llista de pixeles y produce un nuevo valor
+-- que lo representa, pero realiza la concatenacion horizontal.
+
+concatPixels :: [[a]] -> [[a]]
 concatPixels lista_pixels = traspuesta ( concatAlLado lista_pixels )
 
-concatAlLadoDos = []
-concatAlLadoDOs lista_pixels = (head lista_pixels) ++ [["       "]] ++ concatAlLadoDos (tail lista_pixels)
+
+------------------------------------------------------
 
 
-nosequenombre lista_pixels = traspuesta (concatAlLadoDos lista_pixels)
+-- Funcion que convierte una cadena de caracteres en un valor
+-- Pixels, agregando un espacio blanco entre caracteres.
+
+messageToPixels :: [Char] -> [[Char]]
+messageToPixels lista = imprimir ( concatHorizontalConEspacio lista )
+
+
+------------------------------------------------------
+
+           
+                -- Efectos Especiales
+
+
+-- Desplaza una hilera hacia arriba.
+
+up :: [a] -> [a]
+up pixel = reverse ( take ( ( length pixel ) - 1 ) ( reverse pixel ) ) ++ [head pixel] 
+
+-- Desplaza una hilera hacia abajo.
+
+down :: [a] -> [a]
+down pixel = last pixel : take ( ( length pixel ) - 1 ) pixel
+
+-- Desplaza la primera columna hacia la derecha.
+
+left :: [[a]] -> [[a]]
+left [] = []
+left pixel = up ( head pixel ) : left ( tail pixel ) 
+
+-- Desplaza la primera columna hacia la izquierda.
+
+right :: [[a]] -> [[a]]
+right [] = []
+right pixel = down  (head pixel ) : right ( tail pixel )
+
+-- Invierte el orden de las filas.
+
+upsideDown :: [a] -> [a]
+upsideDown pixel = reverse pixel
+
+-- Invierte el orden de las columnas.
+
+backwards :: [[a]] -> [[a]]
+backwards [] = []
+backwards pixel = reverse ( head pixel ) : backwards ( tail pixel )
+
+-- Intercambia blanco por asteriscos y viceversa.
+
+negative :: [[Char]] -> [[Char]] 
+negative [] = []
+negative pixel = astToSpace ( head pixel ) : negative ( tail pixel ) 
 
 
 
-messageToPixels = undefined
 
-up = undefined
-down = undefined
-left = undefined
-right = undefined
-upsideDown = undefined
-backwards = undefined
-negative = undefined
