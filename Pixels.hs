@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 --module Pixels ( fontBitmap,
 --        font,pixelsToString,
 --        pixelListToPixels,pixelListToString) where
+=======
+
+module Pixels ( fontBitmap,
+        font,pixelsToString,
+        pixelListToPixels,pixelListToString) where
+>>>>>>> f218364e57969732a2054d05992b1f3c8e13573f
 import Data.Char
 import Data.List
 import Numeric(showHex, showIntAtBase)
@@ -134,7 +141,11 @@ binToString xs
 
 -- Completa los bits con ceros a la izquierda
 completeBin1 x 
+<<<<<<< HEAD
                 | (length x < 7) = completeBin1 ("0"++x) 
+=======
+                | (length x < 7) = reverse(completeBin1 ("0"++x)) 
+>>>>>>> f218364e57969732a2054d05992b1f3c8e13573f
                 | (length x == 7) = x 
 
 -- Completa, a cada elemento de la lista, con ceros a la izquierda 
@@ -145,12 +156,21 @@ concatenar [] = ""
 concatenar lista_char = head lista_char ++ concatenar (tail lista_char)
 
 font a =  imprimir ( dibujarListas (fontBitmap!!((ord a) -32)))
+<<<<<<< HEAD
 
 
 pixelsToString letra = concatenar(vuelta (dibujarListas(fontBitmap!!((ord letra) - 32))))
 
 --Ejemplo de uso mappM_ print (pixelListToPixels [font 'N', font 'A', font 'I'])
 
+=======
+
+
+pixelsToString letra = concatenar(vuelta (dibujarListas(fontBitmap!!((ord letra) - 32))))
+
+--Ejemplo de uso mappM_ print (pixelListToPixels [font 'N', font 'A', font 'I'])
+
+>>>>>>> f218364e57969732a2054d05992b1f3c8e13573f
 pixelListToPixels []=[]
 pixelListToPixels lista_pixels = (head lista_pixels )++[""] ++pixelListToPixels (tail lista_pixels)
 
