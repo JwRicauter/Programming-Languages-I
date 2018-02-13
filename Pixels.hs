@@ -186,11 +186,24 @@ nosequenombre lista_pixels = traspuesta (concatAlLadoDos lista_pixels)
 
 
 messageToPixels = undefined
+up pixel = reverse(take ((length pixel)-1) (reverse pixel)) ++ [head pixel] 
 
-up = undefined
-down = undefined
-left = undefined
-right = undefined
-upsideDown = undefined
-backwards = undefined
-negative = undefined
+down pixel = last pixel : take ((length pixel)-1) pixel
+
+left [] =[]
+left pixel = up(head pixel) : left (tail pixel) 
+
+right [] =[]
+right pixel = down (head pixel): right (tail pixel)
+
+upsideDown pixel = reverse pixel
+
+backwards []=[]
+backwards pixel = reverse(head pixel): backwards (tail pixel)
+
+astToSpace [] = ""
+astToSpace xs 
+                | (head xs == '*') = " " ++ astToSpace (tail xs) 
+                | (head xs == ' ') = "*" ++ astToSpace (tail xs) 
+negative [] = []
+negative pixel = astToSpace(head pixel): negative (tail pixel) 
