@@ -320,4 +320,29 @@ negative pixel = astToSpace ( head pixel ) : negative ( tail pixel )
 
 
 
+<<<<<<< HEAD
 
+=======
+messageToPixels = undefined
+up pixel = reverse(take ((length pixel)-1) (reverse pixel)) ++ [head pixel] 
+
+down pixel = last pixel : take ((length pixel)-1) pixel
+
+left [] =[]
+left pixel = up(head pixel) : left (tail pixel) 
+
+right [] =[]
+right pixel = down (head pixel): right (tail pixel)
+
+upsideDown pixel = reverse pixel
+
+backwards []=[]
+backwards pixel = reverse(head pixel): backwards (tail pixel)
+
+astToSpace [] = ""
+astToSpace xs 
+                | (head xs == '*') = " " ++ astToSpace (tail xs) 
+                | (head xs == ' ') = "*" ++ astToSpace (tail xs) 
+negative [] = []
+negative pixel = astToSpace(head pixel): negative (tail pixel) 
+>>>>>>> a93b384091b00ae2efa02a2f5361d21b56c6ed63
