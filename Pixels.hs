@@ -5,8 +5,7 @@
 --              Jawil Ricauter, 13-11199
 
 
-module Pixels ( fontBitmap,
-        font,pixelsToString,
+module Pixels (font,pixelsToString,
         pixelListToPixels,pixelListToString) where
 
 import Data.Char
@@ -115,18 +114,11 @@ fontBitmap =
 ------------------------------------------------------
 
 -- Tipo de dato : Pixel
-data Pixel = Pixel{ mensaje:: String }
+type Pixels =[String]
 
 ------------------------------------------------------
 
                 -- Funciones Auxiliares
-
-
--- Convierte el numero de hexadecimal a binario.
-
-hexaToBin :: (Integral a, Show a) => [a] -> [String]
-hexaToBin [] = [] 
-hexaToBin lista = showIntAtBase 2 intToDigit ( head lista ) "": hexaToBin ( tail lista )
 
 
 -- Completa, a cada elemento de la lista, con ceros a la izquierda .
@@ -138,7 +130,7 @@ completeBin xs = completeBin1( head xs ): completeBin ( tail xs )
 
 -- Completa los bits con ceros a la izquierda.
 
-completeBin1 :: [Char] -> [Char]
+completeBin1 :: String -> String
 completeBin1 x 
                 | ( length x < 7 ) = completeBin1 ( "0" ++ x ) 
                 | ( length x < 7 ) = reverse( completeBin1 ( "0" ++ x ) ) 
@@ -147,7 +139,7 @@ completeBin1 x
 
 -- Pasa de binario a * y " " Ej:  binToString "110110"   >"** ** ".
 
-binToString:: [Char] -> [Char]
+binToString:: String -> String
 binToString [] = ""
 binToString xs 
                 | ( head xs == '1' ) = "*" ++ binToString ( tail xs ) 
@@ -182,10 +174,10 @@ vuelta :: [a] -> [[a]]
 vuelta lista = reverse ( traspuesta lista )
 
 
--- Metodo para imprimir el font.
+-- Metodo para imprimir pixeles.
 
-imprimir :: [a] -> [[a]]
-imprimir lista = ( vuelta ( lista ) )
+imprimir :: Pixels -> IO()
+imprimir lista = mapM_ print lista
 
 
 -- Funcion que concatena strings.
@@ -197,8 +189,8 @@ concatenar lista_char = head lista_char ++ concatenar ( tail lista_char )
 
 -- Metodo font que devuelve el grafico del caracter.
 
-font :: Char -> [[Char]]
-font a =  imprimir ( dibujarListas ( fontBitmap!!( ( ord a ) -32 ) ) )
+font :: Char -> Pixels
+font a =  vuelta ( dibujarListas ( fontBitmap!!( ( ord a ) -32 ) ) )
 
 
 -- Concatena la forma grafica de un pixel sin espacio en medio.
@@ -223,13 +215,17 @@ astToSpace xs
                 | ( head xs == '*' ) = " " ++ astToSpace ( tail xs ) 
                 | ( head xs == ' ' ) = "*" ++ astToSpace ( tail xs )
 
+up_aux :: String -> String
+up_aux pixel = reverse ( take ( ( length pixel ) - 1 ) ( reverse pixel ) ) ++ [head pixel] 
 
+down_aux :: String -> String
+down_aux pixel = last pixel : take ( ( length pixel ) - 1 ) pixel
 ------------------------------------------------------
 
 
 -- PixelToString convierte un valor del tipo pixel, en un string, incluyendo los saltos.
 
-pixelsToString :: [[Char]] -> [Char]
+pixelsToString :: Pixels -> String
 pixelsToString fuente = concatenar ( fuente )
 
 
@@ -238,7 +234,7 @@ pixelsToString fuente = concatenar ( fuente )
 
 -- pixelListToPixels convierte una lista de Pixeles en un unico valor Pixels que lo represente.
 
-pixelListToPixels :: [[[Char]]] -> [[Char]]
+pixelListToPixels :: [Pixels] -> Pixels
 pixelListToPixels [] = []
 pixelListToPixels lista_pixels = ( head lista_pixels ) ++ ["     "] ++ pixelListToPixels ( tail lista_pixels )
 
@@ -249,7 +245,7 @@ pixelListToPixels lista_pixels = ( head lista_pixels ) ++ ["     "] ++ pixelList
 -- Procesa lista de pixels, convirtiendo cada elemento a string
 -- y luego mezcla todos los resultados incluyendo saltos de linea.
 
-pixelListToString :: [[[Char]]] -> [[Char]]
+pixelListToString :: [Pixels] -> [String]
 pixelListToString lista_pixels = pixelListToPixels ( lista_pixels )
 
 
@@ -270,7 +266,7 @@ concatPixels lista_pixels = traspuesta ( concatAlLado lista_pixels )
 -- Pixels, agregando un espacio blanco entre caracteres.
 
 messageToPixels :: [Char] -> [[Char]]
-messageToPixels lista = imprimir ( concatHorizontalConEspacio lista )
+messageToPixels lista = vuelta ( concatHorizontalConEspacio lista )
 
 
 ------------------------------------------------------
@@ -281,68 +277,39 @@ messageToPixels lista = imprimir ( concatHorizontalConEspacio lista )
 
 -- Desplaza una hilera hacia arriba.
 
-up :: [a] -> [a]
+up :: Pixels -> Pixels
 up pixel = reverse ( take ( ( length pixel ) - 1 ) ( reverse pixel ) ) ++ [head pixel] 
 
 -- Desplaza una hilera hacia abajo.
 
-down :: [a] -> [a]
+down :: Pixels -> Pixels
 down pixel = last pixel : take ( ( length pixel ) - 1 ) pixel
 
 -- Desplaza la primera columna hacia la derecha.
 
-left :: [[a]] -> [[a]]
+left :: Pixels -> Pixels
 left [] = []
-left pixel = up ( head pixel ) : left ( tail pixel ) 
+left pixel = up_aux ( head pixel ) : left ( tail pixel ) 
 
 -- Desplaza la primera columna hacia la izquierda.
 
-right :: [[a]] -> [[a]]
+right :: Pixels -> Pixels
 right [] = []
-right pixel = down  (head pixel ) : right ( tail pixel )
+right pixel = down_aux  (head pixel ) : right ( tail pixel )
 
 -- Invierte el orden de las filas.
 
-upsideDown :: [a] -> [a]
+upsideDown :: Pixels -> Pixels
 upsideDown pixel = reverse pixel
 
 -- Invierte el orden de las columnas.
 
-backwards :: [[a]] -> [[a]]
+backwards :: Pixels-> Pixels
 backwards [] = []
 backwards pixel = reverse ( head pixel ) : backwards ( tail pixel )
 
 -- Intercambia blanco por asteriscos y viceversa.
 
-negative :: [[Char]] -> [[Char]] 
+negative :: Pixels -> Pixels 
 negative [] = []
 negative pixel = astToSpace ( head pixel ) : negative ( tail pixel ) 
-
-
-
-<<<<<<< HEAD
-
-=======
-messageToPixels = undefined
-up pixel = reverse(take ((length pixel)-1) (reverse pixel)) ++ [head pixel] 
-
-down pixel = last pixel : take ((length pixel)-1) pixel
-
-left [] =[]
-left pixel = up(head pixel) : left (tail pixel) 
-
-right [] =[]
-right pixel = down (head pixel): right (tail pixel)
-
-upsideDown pixel = reverse pixel
-
-backwards []=[]
-backwards pixel = reverse(head pixel): backwards (tail pixel)
-
-astToSpace [] = ""
-astToSpace xs 
-                | (head xs == '*') = " " ++ astToSpace (tail xs) 
-                | (head xs == ' ') = "*" ++ astToSpace (tail xs) 
-negative [] = []
-negative pixel = astToSpace(head pixel): negative (tail pixel) 
->>>>>>> a93b384091b00ae2efa02a2f5361d21b56c6ed63
