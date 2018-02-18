@@ -6,7 +6,8 @@
 
 
 module Pixels (font,pixelsToString,
-        pixelListToPixels,pixelListToString) where
+        pixelListToPixels,pixelListToString,concatPixels,
+        messageToPixels,up,down,left,right,upsideDown,backwards,negative) where
 
 import Data.Char
 import Data.List
@@ -265,7 +266,7 @@ concatPixels lista_pixels = traspuesta ( concatAlLado lista_pixels )
 -- Funcion que convierte una cadena de caracteres en un valor
 -- Pixels, agregando un espacio blanco entre caracteres.
 
-messageToPixels :: [Char] -> [[Char]]
+messageToPixels :: [Char] -> Pixels
 messageToPixels lista = vuelta ( concatHorizontalConEspacio lista )
 
 
