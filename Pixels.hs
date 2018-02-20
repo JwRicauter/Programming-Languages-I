@@ -256,8 +256,9 @@ pixelListToString lista_pixels = pixelListToPixels ( lista_pixels )
 -- Recibe una llista de pixeles y produce un nuevo valor
 -- que lo representa, pero realiza la concatenacion horizontal.
 
-concatPixels :: [[a]] -> [[a]]
-concatPixels lista_pixels = traspuesta ( concatAlLado lista_pixels )
+concatPixels ::[Pixels] -> Pixels
+
+concatPixels lista_pixels = foldr1 (zipWith(++)) lista_pixels
 
 
 ------------------------------------------------------
