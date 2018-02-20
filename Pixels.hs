@@ -6,7 +6,8 @@
 
 
 module Pixels (font,pixelsToString,
-        pixelListToPixels,pixelListToString) where
+        pixelListToPixels,pixelListToString,concatPixels,
+        messageToPixels,up,down,left,right,upsideDown,backwards,negative) where
 
 import Data.Char
 import Data.List
