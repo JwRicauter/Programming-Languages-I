@@ -182,7 +182,7 @@ imprimir lista = mapM_ print lista
 
 -- Funcion que concatena strings.
 
-concatenar :: [[Char]] -> [Char]
+concatenar :: Pixels -> [Char]
 concatenar [] = ""
 concatenar lista_char = head lista_char ++ concatenar ( tail lista_char )
 
@@ -265,7 +265,7 @@ concatPixels lista_pixels = traspuesta ( concatAlLado lista_pixels )
 -- Funcion que convierte una cadena de caracteres en un valor
 -- Pixels, agregando un espacio blanco entre caracteres.
 
-messageToPixels :: [Char] -> [[Char]]
+messageToPixels :: [Char] -> Pixels
 messageToPixels lista = vuelta ( concatHorizontalConEspacio lista )
 
 
